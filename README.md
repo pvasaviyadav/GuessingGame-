@@ -1,47 +1,45 @@
-public class Theater {
-  private int seats=100;
-  private static Theater t=null;
-  private Theater(){
-  }
-  public static Theater getInstance(){
-      if (t==null){
-          t=new Theater();
-          return t;
-      }
-      else {
-          return t;
-      }
-  }
-  public  void book(int n){
-      if (n<=seats){
-          seats-=n;
-          System.out.println("seats are booked");
-      }
-      else {
-          if (n==0)
-              System.out.println("so sorry all seats are booked");
-          else
-              System.out.println("sorry "+seats+" seats are available");
+public class Game {
 
-      }
-  }
-  public int getSeats(){
-      return seats;
-  }
-    }
-    class book{
-    public static void booktickets(){
-        Scanner os=new Scanner(System.in);
-        Theater m1=Theater.getInstance();
-        System.out.println(m1.getSeats()+" seats are available");
-        System.out.println("enter seats");
-        int seats=os.nextInt();
-        m1.book(seats);
-    }
-    }
-    class bookmyshow{
-        public static void main(String[] args) {
-            book.booktickets();
-            book.booktickets();
-        }
-    }
+	public static void main(String[] args)throws Exception {
+		int score=0;
+		List<Integer> sgn=new ArrayList<>();
+		List<Integer> uen=new ArrayList<>();
+		
+		Scanner os=new Scanner(System.in);
+		System.out.println("enter id :");
+		int id=os.nextInt();
+		System.out.println("enter name :");
+		String name=os.next();
+		Timestamp startedat=new Timestamp(System.currentTimeMillis());
+		for(int i=0;i<3;i++) {
+			Random r=new Random();
+			int num=r.nextInt(10);
+			System.out.println("guess the number");
+			int un=os.nextInt();
+			
+			if(num==un) {
+				score+=10;
+			}
+			sgn.add(num);
+			uen.add(un);
+		}
+		SaveGameInfo.saveDate(id, name, ""+sgn, ""+uen, score, startedat);
+	}
+
+}
+public class SaveGameInfo {
+	public static void saveDate(int id,String name,String sgn,String uen,int score,java.sql.Timestamp startedat) throws Exception {
+		Class.forName("com.mysql.cj.jdbc.Driver");
+		Connection con=DriverManager.getConnection("jdbc:mysql://localhost:3306/jdbc_001","root","tiger");
+		PreparedStatement ps=con.prepareStatement("insert into game(id,name,sgn,uen,score,startedat)values(?,?,?,?,?,?)");
+		ps.setInt(1, id);
+		ps.setString(2, name);
+		ps.setString(3, sgn);
+		ps.setString(4, uen);
+		ps.setInt(5, score);
+		ps.setTimestamp(6, startedat);
+		
+		ps.execute();
+		System.out.println("your score : "+score);
+	}
+}
